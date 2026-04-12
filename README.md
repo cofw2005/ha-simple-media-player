@@ -2,6 +2,14 @@
 
 A high-performance, compact network audio player based on the ESP32-S3-DevkitC-1 and PCM5102A DAC. Optimized for **Music Assistant (Home Assistant)** with a focus on stability, zero-stutter playback, and deep software-hardware integration.
 
+<div align="center">
+  <img src="./images/outlook.jpg" width="600" alt="Components">
+</div>
+
+<div align="center">
+  <img src="./images/inside.jpg" width="600" alt="Components">
+</div>
+
 ---
 
 ## 🚀 Key Features
