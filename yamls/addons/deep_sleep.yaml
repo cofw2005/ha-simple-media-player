@@ -1,0 +1,76 @@
+# =============================================================================
+# Deep sleep configuration
+# =============================================================================
+# Use PCM5102A DAC onboard 3.5mm Jack detect pin, connect to GPIO11
+# GPIO11 mode is set to INPUT_PULLUP
+# When audio plug is unplugged, GPIO11 is pulled to low by audio output L
+# When audio plug is plugged, GPIO11 is pulled up by internal resistor
+# GPIO11 is also used by GPIO binary_sensor to show status to home assistant
+# =============================================================================
+
+# If no plug plugged, trigger delayed deep sleep
+api:
+  on_client_connected:
+    - delay: 2s
+    - if:
+        condition:
+          binary_sensor.is_off: plug_detection
+        then:
+          - logger.log: "Booted up without audio plug."
+          - script.execute: delayed_sleep
+
+  # Define an Action for home assistnat to call
+  services:
+    - service: enter_deep_sleep
+      then:
+        - logger.log: "HA Command: Entering Deep Sleep immediately."
+        - script.execute: safe_deep_sleep
+    - service: delayed_deep_sleep
+      then:
+        - script.execute: delayed_sleep
+
+# Expose a binary_sensor to home assistant for the plug detection
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO11
+      mode: INPUT_PULLUP
+      allow_other_uses: true
+    #use_interrupt: false
+    name: "Plug Detection"
+    id: plug_detection
+    filters:
+      - delayed_on: 100ms
+      - delayed_off: 100ms
+    on_press:
+      then:
+        - logger.log: "Audio plug plugged in."
+        - script.stop: delayed_sleep
+    on_release:
+      then:
+        - logger.log: "Audio plug unplugged."
+        - script.execute: delayed_sleep
+
+deep_sleep:
+  id: ds_config
+  wakeup_pin:
+    - pin:
+        number: GPIO11
+        #mode: INPUT_PULLUP
+        allow_other_uses: true
+      wakeup_pin_mode: IGNORE
+    
+script:
+  - id: safe_deep_sleep
+    mode: single
+    then:
+      - media_player.stop: external_media_player
+      - deep_sleep.enter: ds_config
+
+  - id: delayed_sleep
+    mode: restart
+    then:
+      - logger.log: "10 minutes countdown to enter deep sleep..."
+      - delay: 10min
+      - script.execute: safe_deep_sleep
+

@@ -1,0 +1,56 @@
+sensor:
+  # SRAM (Internal Data RAM) free spaces
+  - platform: template
+    name: "SRAM Free"
+    id: sram_free
+    unit_of_measurement: "kB"
+    icon: "mdi:memory"
+    state_class: "measurement"
+    accuracy_decimals: 1
+
+  # PSRAM free spaces
+  - platform: template
+    name: "PSRAM Free"
+    id: psram_free
+    unit_of_measurement: "mB"
+    icon: "mdi:database-import"
+    state_class: "measurement"
+    accuracy_decimals: 2
+
+  # IRAM (Instruction RAM) free spaces
+  - platform: template
+    name: "IRAM Free"
+    id: iram_free
+    unit_of_measurement: "kB"
+    icon: "mdi:code-braces"
+    state_class: "measurement"
+
+  # Max Allocatable Block
+  - platform: template
+    name: "Max Allocatable Block"
+    id: max_block
+    unit_of_measurement: "kB"
+    icon: "mdi:puzzle"
+    state_class: "measurement"
+
+interval:
+  - interval: 15s
+    then:
+      - lambda: |-
+          // 1. SRAM (Internal 8-bit)
+          float s_free = heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT) / 1024.0;
+          id(sram_free).publish_state(s_free);
+
+          // 2. SRAM
+          float p_free = heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024.0 / 1024.0; // 转为 MB
+          id(psram_free).publish_state(p_free);
+
+          // 3. IRAM
+          float i_free = heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_32BIT) / 1024.0;
+          id(iram_free).publish_state(i_free);
+
+          // 4. Max Allocatable Block
+          float m_block = heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL) / 1024.0;
+          id(max_block).publish_state(m_block);
+
+          ESP_LOGD("monitor", "SRAM: %.1fkB, PSRAM: %.2fMB, MaxBlock: %.1fkB", s_free, p_free, m_block);
