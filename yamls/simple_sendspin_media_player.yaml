@@ -95,11 +95,6 @@ api:
 
   reboot_timeout: 0s
 
-# Enable http request
-http_request:
-  id: http_req
-  buffer_size_rx: 4096
-
 # =============================================================================
 # Media player / I2S configurations
 # =============================================================================
@@ -117,7 +112,7 @@ external_components:
 
 sendspin:
   id: sendspin_hub
-  task_stack_in_psram: false
+  task_stack_in_psram: true
 
 media_source:
   - platform: sendspin
