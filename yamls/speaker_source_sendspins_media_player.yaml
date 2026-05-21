@@ -100,6 +100,12 @@ http_request:
   buffer_size_rx: 4096
 
 # Sendspin related components are pinned to specific commits for reproducible builds
+# =============================================================================
+# !!! Important Notice !!!
+# Now these external components have been integrated into core ESPHome,
+# this whole "external_components" block can be removed if run into issue,
+# to be noted, I haven't test it yet myself.
+# =============================================================================
 external_components:
   - source:
       # https://github.com/esphome/esphome/pull/14933
