@@ -102,6 +102,11 @@ api:
 # 100ms - 17.64K, 200ms - 35.2KB, 500ms - 86.13KB
 # If no sound by setting bits_per_sample to 32bit, set to 16bit instead
 # =============================================================================
+# !!! Important Notice !!!
+# Now these external components have been integrated into core ESPHome,
+# this whole "external_components" block can be removed if run into issue,
+# to be noted, I haven't test it yet myself.
+# =============================================================================
 external_components:
   - source:
       # https://github.com/esphome/esphome/pull/14933
